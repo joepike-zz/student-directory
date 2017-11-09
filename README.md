@@ -5,6 +5,5 @@ at Villians Academy.
 
 ## How to use ##
 
-'''shell
 ruby directory.rb
-'''
+

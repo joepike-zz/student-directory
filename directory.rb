@@ -41,16 +41,18 @@ end
 def input_students
   puts "Enter the name of the student"
   puts "Hit enter twice to exit"
- 
+  count = 0
   name = STDIN.gets.chomp
   # while the name is not empty, repeat this code
   while !name.empty?
     # add the student hash to the array
     add_student_info(name, :november)
     puts "Now we have #{@students.count} students"
+    count += 1
     # get another name from the user
     name = STDIN.gets.chomp
   end
+  count > 0 ? (puts "You have just inputted #{count} students. Reselect to add more students to the list") : (puts "You did not enter a name. Reselect to add students")
 end
 
 def print_header
@@ -62,6 +64,7 @@ def print_students_list
   @students.each do |student|
     puts "#{student[:name]} (#{student[:cohort]} cohort)"
   end
+  puts "Printed the complete list of students..."
 end
 
 def print_footer
@@ -69,7 +72,9 @@ def print_footer
 end
 
 def save_students
-  filename = check_filename
+  #filename = check_filename
+  puts "Enter the filename for the file you wish to save the list of students to"
+  filename = gets.chomp
   # open the file for writing
   file = File.open(filename, "w")
   # iterate over the array of students
@@ -79,13 +84,13 @@ def save_students
     file.puts csv_line
   end
   file.close
+  puts "Saved #{@students.count} students to #{filename}"
 end
 
 def try_load_students
   filename = check_filename
     if File.exist?(filename)
       load_students
-      puts "Loaded #{@students.count} from #{filename}"
     else
       puts "Sorry, #{filename} does not exist"
       exit
@@ -101,6 +106,7 @@ def load_students
     add_student_info(name, cohort)
   end
   file.close
+  puts "Loaded #{@students.count} students from #{filename}"
 end
 
 def add_student_info(name, cohort)

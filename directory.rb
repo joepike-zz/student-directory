@@ -46,7 +46,7 @@ def input_students
   # while the name is not empty, repeat this code
   while !name.empty?
     # add the student hash to the array
-    @students << {name: name, cohort: :november}
+    add_student_info(name, :november)
     puts "Now we have #{@students.count} students"
     # get another name from the user
     name = STDIN.gets.chomp
@@ -69,8 +69,9 @@ def print_footer
 end
 
 def save_students
+  filename = check_filename
   # open the file for writing
-  file = File.open("students.csv", "w")
+  file = File.open(filename, "w")
   # iterate over the array of students
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
@@ -81,28 +82,35 @@ def save_students
 end
 
 def try_load_students
-  filename = ARGV.first
-  return if filename.nil?
-  if File.exist?(filename)
-    load_students(filename)
-    puts "Loaded #{@students.count} from #{filename}"
-  else
-    puts "Sorry, #{filename} does not exist"
-    exit
-  end
+  filename = check_filename
+    if File.exist?(filename)
+      load_students
+      puts "Loaded #{@students.count} from #{filename}"
+    else
+      puts "Sorry, #{filename} does not exist"
+      exit
+    end
 end
 
-def load_students(filename = "students.csv")
-  
+def load_students
+  filename = check_filename
   # open the file for reading
   file = File.open(filename, "r")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(',')
-    @students << {name: name, cohort: cohort.to_sym}
+    add_student_info(name, cohort)
   end
   file.close
 end
-    
+
+def add_student_info(name, cohort)
+  @students << {name: name, cohort: cohort.to_sym}
+end
+
+def check_filename
+  ARGV.empty? ? filename = "students.csv" : filename = ARGV.firs
+end
+
 try_load_students    
 interactive_menu
 

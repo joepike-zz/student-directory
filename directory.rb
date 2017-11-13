@@ -72,48 +72,57 @@ def print_footer
 end
 
 def save_students
-  #filename = check_filename
   puts "Enter the filename for the file you wish to save the list of students to"
   filename = gets.chomp
-  # open the file for writing
-  file = File.open(filename, "w")
-  # iterate over the array of students
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+  if File.exist?(filename)
+    File.open(filename, "w") do |f|
+      @students.each do |student|
+        student_data = [student[:name], student[:cohort]]
+        csv_line = student_data.join(",")
+        f.puts csv_line
+      end
+    end
+    puts "Saved #{@students.count} students to #{filename}"
+  else
+    puts "This file does not exist. Please reselect to enter another filename to save to"
   end
-  file.close
-  puts "Saved #{@students.count} students to #{filename}"
 end
 
 def try_load_students
-  filename = check_filename
+  filename = startup_check_filename
     if File.exist?(filename)
-      load_students
+      load(filename)
     else
       puts "Sorry, #{filename} does not exist"
       exit
     end
 end
 
-def load_students
-  filename = check_filename
-  # open the file for reading
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
-    add_student_info(name, cohort)
+def load(filename)
+  File.open(filename, "r") do |f|
+    f.readlines.each do |line|
+      name, cohort = line.chomp.split(',')
+      add_student_info(name, cohort)
+    end
   end
-  file.close
-  puts "Loaded #{@students.count} students from #{filename}"
+end
+
+def load_students
+  puts "Enter the filename for the file you wish to load the list of students from"
+  filename = gets.chomp
+  if File.exist?(filename)
+    load(filename)
+    puts "Loaded #{@students.count} students from #{filename}"
+  else
+    puts "This file does not exist. Please reselect to enter another filename to load"
+  end
 end
 
 def add_student_info(name, cohort)
   @students << {name: name, cohort: cohort.to_sym}
 end
 
-def check_filename
+def startup_check_filename
   ARGV.empty? ? filename = "students.csv" : filename = ARGV.firs
 end
 

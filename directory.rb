@@ -1,3 +1,4 @@
+require 'csv'
 @students = []
 
 def interactive_menu
@@ -39,17 +40,13 @@ def process(selection)
 end
 
 def input_students
-  puts "Enter the name of the student"
-  puts "Hit enter twice to exit"
+  puts "Enter the name of the student. Hit enter twice to exit"
   count = 0
   name = STDIN.gets.chomp
-  # while the name is not empty, repeat this code
   while !name.empty?
-    # add the student hash to the array
     add_student_info(name, :november)
     puts "Now we have #{@students.count} students"
     count += 1
-    # get another name from the user
     name = STDIN.gets.chomp
   end
   count > 0 ? (puts "You have just inputted #{count} students. Reselect to add more students to the list") : (puts "You did not enter a name. Reselect to add students")
@@ -75,11 +72,11 @@ def save_students
   puts "Enter the filename for the file you wish to save the list of students to"
   filename = gets.chomp
   if File.exist?(filename)
-    File.open(filename, "w") do |f|
+    CSV.open(filename, "w") do |csv|
       @students.each do |student|
         student_data = [student[:name], student[:cohort]]
-        csv_line = student_data.join(",")
-        f.puts csv_line
+        #csv_line = student_data.join(",")
+        csv << student_data
       end
     end
     puts "Saved #{@students.count} students to #{filename}"
@@ -99,11 +96,9 @@ def try_load_students
 end
 
 def load(filename)
-  File.open(filename, "r") do |f|
-    f.readlines.each do |line|
-      name, cohort = line.chomp.split(',')
+  CSV.foreach(filename) do |row|
+      name, cohort = row.map{|s|s.split(/[,:]/)}.flatten
       add_student_info(name, cohort)
-    end
   end
 end
 
@@ -119,7 +114,7 @@ def load_students
 end
 
 def add_student_info(name, cohort)
-  @students << {name: name, cohort: cohort.to_sym}
+  @students << {name: name, cohort: cohort}
 end
 
 def startup_check_filename
